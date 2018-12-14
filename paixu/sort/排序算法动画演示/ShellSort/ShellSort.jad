@@ -1,0 +1,139 @@
+// Decompiled by DJ v3.7.7.81 Copyright 2004 Atanas Neshkov  Date: 2005-12-1 23:29:18
+// Home Page : http://members.fortunecity.com/neshkov/dj.html  - Check often for new version!
+// Decompiler options: packimports(3) 
+// Source File Name:   ShellSort.java
+
+import java.applet.Applet;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.EventObject;
+
+public class ShellSort extends Applet
+    implements Runnable, ActionListener
+{
+
+    public void init()
+    {
+        thePersonGroup = new personGroup(groupSize, order);
+        setLayout(new FlowLayout(2));
+        newButton = new Button("New");
+        add(newButton);
+        newButton.addActionListener(this);
+        sizeButton = new Button("Size");
+        add(sizeButton);
+        sizeButton.addActionListener(this);
+        drawButton = new Button("Draw");
+        add(drawButton);
+        drawButton.addActionListener(this);
+        runButton = new Button("Run");
+        add(runButton);
+        runButton.addActionListener(this);
+        stepButton = new Button("Step");
+        add(stepButton);
+        stepButton.addActionListener(this);
+        aWidth = thePersonGroup.getAppletWidth();
+        aHeight = thePersonGroup.getAppletHeight();
+        offscreenImage = createImage(aWidth, aHeight);
+        offscreenGraphics = offscreenImage.getGraphics();
+        runFlag = false;
+        thePersonGroup.setDrawMode(2);
+    }
+
+    public void paint(Graphics g)
+    {
+        thePersonGroup.draw(offscreenGraphics);
+        g.drawImage(offscreenImage, 0, 0, this);
+    }
+
+    public void update(Graphics g)
+    {
+        paint(g);
+    }
+
+    public void actionPerformed(ActionEvent actionevent)
+    {
+        if(actionevent.getSource() == newButton)
+        {
+            runFlag = false;
+            order = order != 1 ? 1 : 2;
+            thePersonGroup = new personGroup(groupSize, order);
+        } else
+        if(actionevent.getSource() == sizeButton)
+        {
+            runFlag = false;
+            groupSize = groupSize != 10 ? 10 : 100;
+            thePersonGroup = new personGroup(groupSize, order);
+        } else
+        if(actionevent.getSource() == drawButton)
+        {
+            runFlag = false;
+            thePersonGroup.setDrawMode(2);
+        } else
+        if(actionevent.getSource() == runButton)
+        {
+            thePersonGroup.setDrawMode(1);
+            runFlag = true;
+        } else
+        if(actionevent.getSource() == stepButton && !thePersonGroup.getDone())
+        {
+            runFlag = false;
+            thePersonGroup.sortStep();
+            thePersonGroup.setDrawMode(1);
+        }
+        repaint();
+    }
+
+    public void start()
+    {
+        if(runner == null)
+        {
+            runner = new Thread(this);
+            runner.start();
+        }
+    }
+
+    public void stop()
+    {
+        runner = null;
+    }
+
+    public void run()
+    {
+        for(Thread thread = Thread.currentThread(); runner == thread;)
+            if(runFlag && !thePersonGroup.getDone())
+            {
+                thePersonGroup.sortStep();
+                repaint();
+                thePersonGroup.setDrawMode(1);
+                int i = groupSize != 10 ? 75 : 250;
+                try
+                {
+                    Thread.sleep(i);
+                }
+                catch(InterruptedException _ex) { }
+            }
+
+    }
+
+    public ShellSort()
+    {
+        groupSize = 10;
+        order = 1;
+    }
+
+    private Image offscreenImage;
+    private Graphics offscreenGraphics;
+    private int aWidth;
+    private int aHeight;
+    private Thread runner;
+    private int groupSize;
+    private personGroup thePersonGroup;
+    private boolean runFlag;
+    private int order;
+    private Button newButton;
+    private Button sizeButton;
+    private Button drawButton;
+    private Button runButton;
+    private Button stepButton;
+}

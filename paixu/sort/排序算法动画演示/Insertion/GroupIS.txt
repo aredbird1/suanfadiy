@@ -1,0 +1,259 @@
+// Decompiled by DJ v3.7.7.81 Copyright 2004 Atanas Neshkov  Date: 2005-12-2 11:41:56
+// Home Page : http://members.fortunecity.com/neshkov/dj.html  - Check often for new version!
+// Decompiler options: packimports(3) 
+// Source File Name:   InsertSort.java
+
+import java.awt.Color;
+import java.awt.Graphics;
+
+class groupIS
+{
+
+    public groupIS(int i, int j)
+    {
+        aSize = i;
+        initOrder = j;
+        theArray = new personIS[aSize + 2];
+        if(aSize == 100)
+        {
+            barWidth = 2;
+            barSeparation = 1;
+        } else
+        {
+            barWidth = 18;
+            barSeparation = 7;
+        }
+        inner = outer = 1;
+        innerOld = outerOld = 1;
+        comps = 0;
+        copies = 0;
+        doneFlag = false;
+        codePart = 1;
+        Color color = new Color(0, 0, 0);
+        if(initOrder == 1)
+        {
+            for(int k = 0; k < aSize; k++)
+            {
+                int i1 = 10 + (int)(Math.random() * 189D);
+                int k1 = (int)(Math.random() * 254D);
+                int i2 = (int)(Math.random() * 254D);
+                int k2 = (int)(Math.random() * 254D);
+                Color color1 = new Color(k1, i2, k2);
+                theArray[k] = new personIS(i1, color1);
+            }
+
+        } else
+        {
+            for(int l = 0; l < aSize; l++)
+            {
+                int j1 = 195 - (195 * l) / aSize;
+                int l1 = 255 - j1;
+                int j2 = 85 * (l % 3);
+                int l2 = j1;
+                Color color2 = new Color(l1, j2, l2);
+                theArray[l] = new personIS(j1, color2);
+            }
+
+        }
+        theArray[aSize + 1] = new personIS(0, Color.lightGray);
+        drawMode = 2;
+    }
+
+    public void setDrawMode(int i)
+    {
+        drawMode = i;
+    }
+
+    public int getAppletWidth()
+    {
+        return 370;
+    }
+
+    public int getAppletHeight()
+    {
+        return 320;
+    }
+
+    public boolean getDone()
+    {
+        return doneFlag;
+    }
+
+    public void arrowText(Graphics g, Color color, String s, int i, int j, boolean flag, boolean flag1)
+    {
+        int k = 35 + i * (barWidth + barSeparation);
+        int l = 230 + (j + 1) * 13;
+        g.setColor(color);
+        if(flag1)
+            g.drawString(s, k, l);
+        if(flag)
+        {
+            g.drawLine(k + barWidth / 2, 232, k + barWidth / 2, l - 13);
+            g.drawLine(k + barWidth / 2, 232, (k + barWidth / 2) - 3, 237);
+            g.drawLine(k + barWidth / 2, 232, k + barWidth / 2 + 3, 237);
+        }
+    }
+
+    public void drawOneBar(Graphics g, int i)
+    {
+        if(theArray[i] == null)
+        {
+            int j = 35 + i * (barWidth + barSeparation);
+            g.setColor(Color.lightGray);
+            g.fillRect(j, 30, barWidth, 200);
+            return;
+        } else
+        {
+            int k = theArray[i].getHeight();
+            int l = 35 + i * (barWidth + barSeparation);
+            int i1 = 230 - k;
+            Color color = theArray[i].getColor();
+            g.setColor(Color.lightGray);
+            g.fillRect(l, 30, barWidth, 200);
+            g.setColor(color);
+            g.fill3DRect(l, i1, barWidth, k, true);
+            return;
+        }
+    }
+
+    public void draw(Graphics g)
+    {
+        if(drawMode != 2)
+        {
+            switch(codePart)
+            {
+            case 1: // '\001'
+                drawOneBar(g, inner);
+                drawOneBar(g, aSize + 1);
+                break;
+
+            case 2: // '\002'
+                drawOneBar(g, aSize + 1);
+                drawOneBar(g, innerOld);
+                drawOneBar(g, inner);
+                break;
+
+            case 3: // '\003'
+                drawOneBar(g, inner);
+                drawOneBar(g, aSize + 1);
+                break;
+            }
+        } else
+        {
+            g.setColor(Color.lightGray);
+            g.fillRect(0, 0, 370, 320);
+            for(int i = 0; i < aSize; i++)
+                drawOneBar(g, i);
+
+            drawOneBar(g, aSize + 1);
+        }
+        g.setColor(Color.lightGray);
+        g.fillRect(0, 0, 135, 32);
+        g.setColor(Color.black);
+        g.drawString("Comparisons = " + comps, 10, 28);
+        g.drawString("Copies = " + copies, 10, 15);
+        g.setColor(Color.lightGray);
+        g.fillRect(0, 230, 370, 78);
+        if(aSize == 10)
+        {
+            arrowText(g, Color.red, "outer", outer, 1, true, true);
+            arrowText(g, Color.blue, "inner", inner, 2, true, true);
+            arrowText(g, Color.magenta, "temp", aSize + 1, 1, true, true);
+            switch(codePart)
+            {
+            case 1: // '\001'
+                if(doneFlag)
+                    arrowText(g, Color.black, "Sort is complete", 0, 3, false, true);
+                else
+                    arrowText(g, Color.black, "Will copy outer to temp", 0, 3, false, true);
+                break;
+
+            case 2: // '\002'
+                if(inner > 0)
+                    arrowText(g, Color.black, "Have compared inner-1 and temp", 0, 3, false, true);
+                else
+                    arrowText(g, Color.black, "Now inner is 0, so", 0, 3, false, true);
+                if(inner > 0 && theArray[inner - 1].getHeight() >= theArray[aSize + 1].getHeight())
+                    arrowText(g, Color.black, "   Will copy inner-1 to inner", 0, 4, false, true);
+                else
+                    arrowText(g, Color.black, "   No copy necessary", 0, 4, false, true);
+                break;
+
+            case 3: // '\003'
+                arrowText(g, Color.black, "Will copy temp to inner", 0, 3, false, true);
+                break;
+            }
+        } else
+        {
+            arrowText(g, Color.red, "xxx", outer, 1, true, false);
+            arrowText(g, Color.blue, "xxx", inner, 2, true, false);
+            arrowText(g, Color.magenta, "xxx", aSize + 1, 3, true, false);
+        }
+        drawMode = 2;
+    }
+
+    public void sortStep()
+    {
+        switch(codePart)
+        {
+        case 1: // '\001'
+            theArray[aSize + 1] = theArray[outer];
+            theArray[outer] = null;
+            copies++;
+            innerOld = inner;
+            inner = outer;
+            codePart = 2;
+            return;
+
+        case 2: // '\002'
+            comps++;
+            if(inner > 0 && theArray[inner - 1].getHeight() >= theArray[aSize + 1].getHeight())
+            {
+                theArray[inner] = theArray[inner - 1];
+                theArray[inner - 1] = null;
+                copies++;
+                innerOld = inner;
+                inner--;
+                return;
+            } else
+            {
+                codePart = 3;
+                return;
+            }
+
+        case 3: // '\003'
+            theArray[inner] = theArray[aSize + 1];
+            theArray[aSize + 1] = null;
+            copies++;
+            outerOld = outer;
+            outer++;
+            if(outer == aSize)
+                doneFlag = true;
+            codePart = 1;
+            return;
+        }
+    }
+
+    private final int appletWidth = 370;
+    private final int appletHeight = 320;
+    private final int maxHeight = 200;
+    private final int topMargin = 30;
+    private final int leftMargin = 10;
+    private final int barLeftMargin = 35;
+    private final int textHeight = 13;
+    private int aSize;
+    private personIS theArray[];
+    private int barWidth;
+    private int barSeparation;
+    private int outer;
+    private int inner;
+    private int outerOld;
+    private int innerOld;
+    private boolean doneFlag;
+    private int codePart;
+    private int comps;
+    private int copies;
+    private int initOrder;
+    private Color newColor;
+    private int drawMode;
+}

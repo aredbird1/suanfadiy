@@ -1,0 +1,29 @@
+// Decompiled by DJ v3.7.7.81 Copyright 2004 Atanas Neshkov  Date: 2005-12-2 11:42:23
+// Home Page : http://members.fortunecity.com/neshkov/dj.html  - Check often for new version!
+// Decompiler options: packimports(3) 
+// Source File Name:   InsertSort.java
+
+import java.awt.Color;
+
+class personIS
+{
+
+    public Color getColor()
+    {
+        return color;
+    }
+
+    public int getHeight()
+    {
+        return height;
+    }
+
+    public personIS(int i, Color color1)
+    {
+        height = i;
+        color = color1;
+    }
+
+    private int height;
+    private Color color;
+}

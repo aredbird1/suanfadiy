@@ -1,0 +1,202 @@
+// Decompiled by DJ v3.7.7.81 Copyright 2004 Atanas Neshkov  Date: 2005-12-1 22:45:19
+// Home Page : http://members.fortunecity.com/neshkov/dj.html  - Check often for new version!
+// Decompiler options: packimports(3) 
+// Source File Name:   BubbleSort.java
+
+import java.awt.Color;
+import java.awt.Graphics;
+
+class groupBS
+{
+
+    public groupBS(int i, int j)
+    {
+        aSize = i;
+        initOrder = j;
+        theArray = new personBS[aSize];
+        if(aSize == 100)
+        {
+            barWidth = 2;
+            barSeparation = 1;
+        } else
+        {
+            barWidth = 20;
+            barSeparation = 10;
+        }
+        outer = aSize - 1;
+        inner = 0;
+        comps = 0;
+        swaps = 0;
+        swapFlag = false;
+        doneFlag = false;
+        drawMode = 2;
+        if(initOrder == 1)
+        {
+            for(int k = 0; k < aSize; k++)
+            {
+                int i1 = (int)(Math.random() * 199D);
+                int k1 = (int)(Math.random() * 254D);
+                int i2 = (int)(Math.random() * 254D);
+                int k2 = (int)(Math.random() * 254D);
+                newColor = new Color(k1, i2, k2);
+                theArray[k] = new personBS(i1, newColor);
+            }
+
+            return;
+        }
+        for(int l = 0; l < aSize; l++)
+        {
+            int j1 = 199 - (199 * l) / aSize;
+            int l1 = 255 - j1;
+            int j2 = 85 * (l % 3);
+            int l2 = j1;
+            newColor = new Color(l1, j2, l2);
+            theArray[l] = new personBS(j1, newColor);
+        }
+
+    }
+
+    public void setDrawMode(int i)
+    {
+        drawMode = i;
+    }
+
+    public int getAppletWidth()
+    {
+        return 370;
+    }
+
+    public int getAppletHeight()
+    {
+        return 320;
+    }
+
+    public boolean getDone()
+    {
+        return doneFlag;
+    }
+
+    public void arrowText(Graphics g, Color color, String s, int i, int j, boolean flag, boolean flag1)
+    {
+        int k = 35 + i * (barWidth + barSeparation);
+        int l = 230 + (j + 1) * 13;
+        g.setColor(color);
+        if(flag1)
+            g.drawString(s, k, l);
+        if(flag)
+        {
+            g.drawLine(k + barWidth / 2, 232, k + barWidth / 2, l - 13);
+            g.drawLine(k + barWidth / 2, 232, (k + barWidth / 2) - 3, 237);
+            g.drawLine(k + barWidth / 2, 232, k + barWidth / 2 + 3, 237);
+        }
+    }
+
+    public void drawOneBar(Graphics g, int i)
+    {
+        int j = theArray[i].getHeight();
+        int k = 35 + i * (barWidth + barSeparation);
+        int l = 230 - j;
+        Color color = theArray[i].getColor();
+        g.setColor(Color.lightGray);
+        g.fillRect(k, 30, barWidth, 200);
+        g.setColor(color);
+        g.fill3DRect(k, l, barWidth, j, true);
+    }
+
+    public void draw(Graphics g)
+    {
+        if(drawMode != 2)
+        {
+            if(swapFlag)
+            {
+                drawOneBar(g, innerOld);
+                drawOneBar(g, innerOld + 1);
+                swapFlag = false;
+            }
+        } else
+        {
+            g.setColor(Color.lightGray);
+            g.fillRect(0, 0, 370, 320);
+            for(int i = 0; i < aSize; i++)
+                drawOneBar(g, i);
+
+        }
+        g.setColor(Color.lightGray);
+        g.fillRect(0, 0, 150, 32);
+        g.setColor(Color.black);
+        g.drawString("Comparisons = " + comps, 10, 28);
+        g.drawString("Swaps = " + swaps, 10, 15);
+        g.setColor(Color.lightGray);
+        g.fillRect(0, 230, 370, 65);
+        if(aSize == 10)
+        {
+            arrowText(g, Color.red, "outer", outer, 3, true, true);
+            arrowText(g, Color.blue, "inner", inner, 1, true, true);
+            arrowText(g, Color.blue, "inner+1", inner + 1, 1, true, true);
+            if(doneFlag)
+                arrowText(g, Color.black, "Sort is complete", inner, 2, false, true);
+            else
+            if(theArray[inner].getHeight() > theArray[inner + 1].getHeight())
+                arrowText(g, Color.blue, "Will be swapped", inner, 2, false, true);
+            else
+                arrowText(g, Color.blue, "Will not be swapped", inner, 2, false, true);
+        } else
+        {
+            arrowText(g, Color.red, "xxx", outer, 3, true, false);
+            arrowText(g, Color.blue, "xxx", inner, 1, true, false);
+            arrowText(g, Color.blue, "xxx", inner + 1, 1, true, false);
+        }
+        drawMode = 2;
+    }
+
+    public void sortStep()
+    {
+        if(doneFlag)
+            return;
+        comps++;
+        if(theArray[inner].getHeight() > theArray[inner + 1].getHeight())
+        {
+            swap(inner, inner + 1);
+            swapFlag = true;
+            swaps++;
+        }
+        innerOld = inner;
+        inner++;
+        if(inner > outer - 1)
+        {
+            inner = 0;
+            outer--;
+            if(outer == 0)
+                doneFlag = true;
+        }
+    }
+
+    public void swap(int i, int j)
+    {
+        personBS personbs = theArray[i];
+        theArray[i] = theArray[j];
+        theArray[j] = personbs;
+    }
+
+    private final int appletWidth = 370;
+    private final int appletHeight = 320;
+    private final int maxHeight = 200;
+    private final int topMargin = 30;
+    private final int leftMargin = 10;
+    private final int barLeftMargin = 35;
+    private final int textHeight = 13;
+    private int aSize;
+    private personBS theArray[];
+    private int barWidth;
+    private int barSeparation;
+    private int outer;
+    private int inner;
+    private int innerOld;
+    private boolean swapFlag;
+    private boolean doneFlag;
+    private int comps;
+    private int swaps;
+    private int initOrder;
+    Color newColor;
+    private int drawMode;
+}
